@@ -168,7 +168,11 @@ def recommendations(user_id: int, request: Request, n: int = 10, _: str = Depend
 @app.post("/v1/predict", response_model=PredictResponse, tags=["recomendaciones"])
 def predict(body: PredictRequest, request: Request, _: str = Depends(require_key)):
     X = store.build_rows(body.user_id, [body.product_id], interactions.live_counts(body.user_id))
-    p = float(predictor.predict(X)[0])
+    try:
+        p = float(predictor.predict(X)[0])
+    except Exception as exc:                                   # p. ej. ThrottlingException del endpoint serverless
+        log.info(json.dumps({"event": "predictor_error", "error": str(exc)}))
+        raise HTTPException(status_code=503, detail="Modelo no disponible, intente nuevamente")
     return PredictResponse(user_id=str(body.user_id), product_id=body.product_id, purchase_probability=round(p, 4),
                            decision=decision(p), threshold=THRESHOLD, reasons=explainer.explain(X)[0])
 

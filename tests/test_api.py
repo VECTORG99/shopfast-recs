@@ -70,6 +70,8 @@ def test_tc20_live_cart_raises_probability(client, app_module):
 def test_tc21_model_failure_returns_503(client, app_module, monkeypatch):
     monkeypatch.setattr(app_module.predictor, "predict", lambda X: (_ for _ in ()).throw(RuntimeError("endpoint caído")))
     assert client.get(f"/v1/recommendations/{USER_A}", headers=H).status_code == 503
+    r = client.post("/v1/predict", headers=H, json={"user_id": USER_A, "product_id": 4099648})
+    assert r.status_code == 503
 
 
 def test_tc22_rate_limit_returns_429(client):

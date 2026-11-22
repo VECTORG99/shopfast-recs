@@ -21,6 +21,16 @@ flowchart LR
   S -. métricas .-> CW
 ```
 
+## Sistema desplegado (AWS Academy Learner Lab, us-east-1)
+| Servicio | URL |
+|---|---|
+| Dashboard | https://100-57-55-190.sslip.io |
+| API + Swagger | https://api.100-57-55-190.sslip.io/docs |
+| RabbitMQ (consola) | https://rabbit.100-57-55-190.sslip.io |
+| Modelo | SageMaker endpoint serverless `shopfast-xgb-endpoint` |
+
+> Las URLs responden mientras la sesión del Learner Lab está iniciada (el EC2 se detiene al terminar cada sesión).
+
 ## Modelo
 | | |
 |---|---|
@@ -49,7 +59,7 @@ Resultados en el conjunto de prueba (febrero 2021, umbral 0,52 elegido en valida
 Autenticación con cabecera `X-API-Key`, límite de solicitudes por llave (`RATE_LIMIT`) y TLS en Caddy.
 
 ```bash
-curl -H "X-API-Key: <llave>" "https://api.<DOMAIN>/v1/recommendations/1515915625532264305?n=5"
+curl -H "X-API-Key: <llave>" "https://api.100-57-55-190.sslip.io/v1/recommendations/1515915625532264305?n=5"
 ```
 
 ## Ejecutar localmente

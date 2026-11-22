@@ -32,7 +32,7 @@ Luego **Elastic IPs → Allocate → Associate** a la instancia. Así la URL no 
 ## 2. Preparar el código y los datos (en el EC2)
 ```bash
 ssh -i labsuser.pem ec2-user@<IP_ELASTICA>
-git clone https://github.com/<usuario>/shopfast-recs.git && cd shopfast-recs
+git clone https://github.com/VECTORG99/shopfast-recs.git && cd shopfast-recs
 # subir el dataset desde tu PC (en otra terminal):
 #   scp -i labsuser.pem events.csv ec2-user@<IP_ELASTICA>:~/shopfast-recs/data/raw/
 python3 -m venv .venv && source .venv/bin/activate

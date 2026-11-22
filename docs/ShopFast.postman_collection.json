@@ -1,0 +1,17 @@
+{
+  "info": {"name": "ShopFast EP3", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},
+  "variable": [{"key": "base", "value": "https://api.<DOMAIN>"}, {"key": "apiKey", "value": "<llave>"}],
+  "auth": {"type": "apikey", "apikey": [{"key": "key", "value": "X-API-Key"}, {"key": "value", "value": "{{apiKey}}"}, {"key": "in", "value": "header"}]},
+  "item": [
+    {"name": "Health", "request": {"method": "GET", "url": "{{base}}/health", "auth": {"type": "noauth"}}},
+    {"name": "Recomendaciones cliente frecuente", "request": {"method": "GET", "url": "{{base}}/v1/recommendations/1515915625532264305?n=5"}},
+    {"name": "Recomendaciones cliente nuevo", "request": {"method": "GET", "url": "{{base}}/v1/recommendations/999?n=5"}},
+    {"name": "Predicción par cliente-producto", "request": {"method": "POST", "url": "{{base}}/v1/predict", "header": [{"key": "Content-Type", "value": "application/json"}],
+      "body": {"mode": "raw", "raw": "{\"user_id\": 1515915625532264305, \"product_id\": 4183873}"}}},
+    {"name": "Registrar carro (RabbitMQ)", "request": {"method": "POST", "url": "{{base}}/v1/interactions", "header": [{"key": "Content-Type", "value": "application/json"}],
+      "body": {"mode": "raw", "raw": "{\"user_id\": 1515915625532264305, \"product_id\": 4183873, \"event_type\": \"cart\"}"}}},
+    {"name": "Sin API Key (401)", "request": {"method": "GET", "url": "{{base}}/v1/recommendations/1515915625532264305", "auth": {"type": "noauth"}}},
+    {"name": "Métricas del modelo", "request": {"method": "GET", "url": "{{base}}/v1/model"}},
+    {"name": "Interacciones procesadas", "request": {"method": "GET", "url": "{{base}}/v1/stats"}}
+  ]
+}

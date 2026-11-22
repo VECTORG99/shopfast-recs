@@ -1,0 +1,67 @@
+{
+  "model": "XGBoost binary:logistic",
+  "hyperparameters": {
+    "objective": "binary:logistic",
+    "eval_metric": "aucpr",
+    "max_depth": 6,
+    "eta": 0.1,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "min_child_weight": 5,
+    "scale_pos_weight": 5
+  },
+  "best_iteration": 63,
+  "rows": {
+    "train": 341445,
+    "validation": 112857,
+    "test": 101735
+  },
+  "test_at_tuned_threshold": {
+    "threshold": 0.52,
+    "accuracy": 0.9530643338084238,
+    "precision": 0.49934749080555224,
+    "recall": 0.8835012594458438,
+    "f1": 0.6380656408701584,
+    "tp": 4209,
+    "fp": 4220,
+    "fn": 555,
+    "tn": 92751
+  },
+  "test_at_0.5": {
+    "threshold": 0.5,
+    "accuracy": 0.9524450778984617,
+    "precision": 0.4956956724057701,
+    "recall": 0.894416456759026,
+    "f1": 0.6378742514970059,
+    "tp": 4261,
+    "fp": 4335,
+    "fn": 503,
+    "tn": 92636
+  },
+  "roc_auc": 0.9692921265657332,
+  "pr_auc": 0.5761648736230346,
+  "baseline_positive_rate": 0.04682754214380498,
+  "hit_at_1": 0.8952489982827705,
+  "hit_at_1_random": 0.4121771553297123,
+  "hit_at_1_users": 1747,
+  "feature_importance_gain": {
+    "pair_carts": 0.9122,
+    "user_past_purchases": 0.0163,
+    "user_products": 0.0143,
+    "pair_days_active": 0.0115,
+    "user_carts": 0.0074,
+    "pair_views": 0.0058,
+    "user_events": 0.0054,
+    "prod_purchases": 0.0046,
+    "prod_cart_rate": 0.0036,
+    "prod_conversion": 0.0035,
+    "pair_sessions": 0.003,
+    "prod_carts": 0.0022,
+    "price": 0.0021,
+    "prod_views": 0.0019,
+    "price_vs_category": 0.0017,
+    "last_event_hour": 0.0016,
+    "category_conversion": 0.0015,
+    "last_event_weekday": 0.0014
+  }
+}

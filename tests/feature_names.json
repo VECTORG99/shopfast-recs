@@ -1,0 +1,20 @@
+[
+  "pair_views",
+  "pair_carts",
+  "pair_sessions",
+  "pair_days_active",
+  "last_event_hour",
+  "last_event_weekday",
+  "prod_views",
+  "prod_carts",
+  "prod_purchases",
+  "prod_conversion",
+  "prod_cart_rate",
+  "price",
+  "price_vs_category",
+  "category_conversion",
+  "user_events",
+  "user_products",
+  "user_carts",
+  "user_past_purchases"
+]

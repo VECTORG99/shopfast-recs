@@ -1,0 +1,15 @@
+# Agrega envío de logs a Amazon CloudWatch Logs (driver awslogs; usa el rol del EC2, LabInstanceProfile)
+x-cw: &cw
+  logging:
+    driver: awslogs
+    options:
+      awslogs-region: us-east-1
+      awslogs-group: /shopfast/ep3
+      awslogs-create-group: "true"
+services:
+  api:
+    <<: *cw
+  worker:
+    <<: *cw
+  dashboard:
+    <<: *cw

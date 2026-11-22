@@ -1,0 +1,9 @@
+data/raw/
+data/processed/*.csv
+data/processed/*.parquet
+data/processed/feature_store/
+.env
+__pycache__/
+.pytest_cache/
+*.tar.gz
+loadtest/results/*.html

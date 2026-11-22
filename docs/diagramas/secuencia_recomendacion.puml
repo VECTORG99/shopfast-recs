@@ -1,0 +1,39 @@
+@startuml secuencia_recomendacion
+skinparam dpi 150
+skinparam sequenceMessageAlign center
+skinparam ParticipantBackgroundColor #E8F1FB
+skinparam ParticipantBorderColor #1168BD
+title Secuencia: interacción y recomendación (flujo completo entrada → modelo → resultado)
+actor "Usuario" as U
+participant "Dashboard\n(Streamlit)" as D
+participant "Caddy\n(TLS)" as C
+participant "API\n(FastAPI)" as A
+queue "RabbitMQ" as Q
+participant "Worker" as W
+database "PostgreSQL" as P
+participant "SageMaker\nendpoint" as S
+== 1. Registro de una interacción (asíncrono) ==
+U -> D : "Simular: agrega al carro"
+D -> C : POST /v1/interactions\nX-API-Key
+C -> A : HTTP (TLS terminado)
+A -> A : valida API Key, rate limit\ny esquema (Pydantic)
+A -> Q : publish(event_id, cart)\ndurable + confirmación
+A --> D : 202 Accepted {event_id}
+Q -> W : entrega mensaje
+W -> P : INSERT ... ON CONFLICT DO NOTHING
+W --> Q : ack (error → DLQ)
+== 2. Solicitud de recomendaciones (síncrono) ==
+U -> D : elige cliente
+D -> C : GET /v1/recommendations/{user_id}?n=10
+C -> A : HTTP
+A -> P : interacciones recientes del cliente
+A -> A : candidatos (historial + populares)\n+ 18 características por candidato
+A -> S : invoke_endpoint (CSV, ~50 filas)
+S --> A : probabilidades
+A -> A : ordena Top-N, decisión (umbral 0,52)\ny 3 motivos (TreeSHAP)
+A --> D : 200 JSON {items, reasons}
+D --> U : tabla + "¿Por qué se recomienda?"
+alt Endpoint no disponible
+  A --> D : 503 "Modelo no disponible"
+end
+@enduml

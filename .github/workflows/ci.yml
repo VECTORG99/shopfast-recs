@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar dependencias
+        run: pip install -r api/requirements.txt -r worker/requirements.txt pytest httpx
+      - name: Pruebas unitarias e integración
+        run: pytest tests -q
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir imágenes Docker
+        run: |
+          docker build -t shopfast/api ./api
+          docker build -t shopfast/worker ./worker
+          docker build -t shopfast/dashboard ./dashboard

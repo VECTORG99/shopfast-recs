@@ -1,0 +1,37 @@
+@startuml arquitectura_desplegada
+!include <C4/C4_Deployment>
+skinparam dpi 150
+LAYOUT_LEFT_RIGHT()
+HIDE_STEREOTYPE()
+title Arquitectura desplegada — ShopFast EP3 (AWS Academy Learner Lab, us-east-1)
+Person(user, "Equipo comercial / e-commerce", "Navegador, Postman o curl")
+Deployment_Node(aws, "AWS us-east-1", "Learner Lab · rol LabRole") {
+  Deployment_Node(ec2, "EC2 t3.medium", "Amazon Linux 2023 · Docker Compose · LabInstanceProfile") {
+    Container(caddy, "Caddy", "Proxy inverso", "HTTPS automático (Let's Encrypt, sslip.io)")
+    Container(dash, "Dashboard", "Streamlit", "Recomendaciones, explicación y métricas")
+    Container(api, "API REST", "FastAPI + Swagger", "API Key, rate limiting, features, SHAP")
+    ContainerQueue(mq, "RabbitMQ", "exchange fanout + DLQ", "Interacciones")
+    Container(worker, "Worker", "Python", "Consume y persiste")
+    ContainerDb(pg, "PostgreSQL", "16", "Interacciones en vivo")
+  }
+  Deployment_Node(sm, "Amazon SageMaker AI", "") {
+    Container(ep, "Endpoint shopfast-xgb-endpoint", "XGBoost 1.7-1 · serverless (o real-time + auto scaling)", "Probabilidad de compra")
+    Container(tj, "Training job", "ml.m5.large", "Entrena con train/validation")
+  }
+  ContainerDb(s3, "Amazon S3", "bucket shopfast-ep3", "Datasets y model.tar.gz")
+  Container(cw, "Amazon CloudWatch", "Logs + métricas", "/shopfast/ep3 · AWS/SageMaker")
+}
+Rel(user, caddy, "HTTPS 443")
+Rel(caddy, dash, "<DOMAIN>")
+Rel(caddy, api, "api.<DOMAIN>")
+Rel(dash, api, "REST + X-API-Key")
+Rel(api, ep, "invoke_endpoint (text/csv)")
+Rel(api, mq, "publica evento")
+Rel(mq, worker, "consume")
+Rel(worker, pg, "INSERT idempotente")
+Rel(api, pg, "lee interacciones recientes")
+Rel(tj, s3, "lee CSV / escribe modelo")
+Rel(ep, s3, "carga model.tar.gz")
+Rel(api, cw, "logs JSON (awslogs)")
+Rel(ep, cw, "Invocations, ModelLatency")
+@enduml

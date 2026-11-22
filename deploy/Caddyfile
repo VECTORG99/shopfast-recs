@@ -1,0 +1,10 @@
+# HTTPS automático con Let's Encrypt usando sslip.io (DOMAIN = <ip-con-guiones>.sslip.io)
+{$DOMAIN} {
+	reverse_proxy dashboard:8501
+}
+api.{$DOMAIN} {
+	reverse_proxy api:8000
+}
+rabbit.{$DOMAIN} {
+	reverse_proxy rabbitmq:15672
+}

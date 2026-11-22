@@ -1,0 +1,72 @@
+# ShopFast Recommendation System — EP3 Equipo 4
+# Local:      docker compose up -d --build          (PREDICTOR=local, modelo xgboost en el contenedor)
+# AWS (EC2):  docker compose -f docker-compose.yml -f docker-compose.aws.yml up -d --build
+services:
+  caddy:
+    image: caddy:2.8
+    ports: ["80:80", "443:443"]
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on: [api, dashboard]
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+    volumes:
+      - ./data/processed:/data:ro
+    depends_on:
+      rabbitmq: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    restart: unless-stopped
+
+  worker:
+    build: ./worker
+    env_file: .env
+    depends_on:
+      rabbitmq: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    restart: unless-stopped
+
+  dashboard:
+    build: ./dashboard
+    environment:
+      API_URL: http://api:8000
+      DASHBOARD_API_KEY: ${DASHBOARD_API_KEY:-dev-key}
+    depends_on: [api]
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-shopfast}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-shopfast}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      retries: 10
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: shopfast
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-shopfast}
+      POSTGRES_DB: shopfast
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./deploy/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shopfast"]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  pgdata:

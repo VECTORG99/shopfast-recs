@@ -1,0 +1,4 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+POST,/v1/interactions,HTTPError('502 Server Error: Bad Gateway for url: /v1/interactions'),1,2026-11-22T07:36:08Z,2026-11-22T07:36:08Z
+GET,/v1/recommendations/{user_id},HTTPError('503 Server Error: Service Unavailable for url: /v1/recommendations/{user_id}'),13,2026-11-22T07:36:07Z,2026-11-22T07:37:15Z
+POST,/v1/predict,HTTPError('500 Server Error: Internal Server Error for url: /v1/predict'),7,2026-11-22T07:36:04Z,2026-11-22T07:38:57Z

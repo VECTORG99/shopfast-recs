@@ -50,8 +50,19 @@ class SageMakerPredictor:
     def predict(self, X: pd.DataFrame) -> np.ndarray:
         buf = io.StringIO()
         X.to_csv(buf, header=False, index=False, float_format="%.6g")
-        resp = self.client.invoke_endpoint(EndpointName=self.endpoint, ContentType="text/csv",
-                                           Accept="text/csv", Body=buf.getvalue().encode())
+        from botocore.exceptions import ClientError
+        # El endpoint serverless a veces responde ModelError o throttling transitorio al escalar
+        # una nueva instancia; botocore no reintenta ModelError, así que se reintenta aquí.
+        for attempt in range(3):
+            try:
+                resp = self.client.invoke_endpoint(EndpointName=self.endpoint, ContentType="text/csv",
+                                                   Accept="text/csv", Body=buf.getvalue().encode())
+                break
+            except ClientError as exc:
+                code = exc.response.get("Error", {}).get("Code", "")
+                if attempt == 2 or code not in ("ModelError", "ThrottlingException", "ServiceUnavailable"):
+                    raise
+                time.sleep(0.3 * (attempt + 1))
         body = resp["Body"].read().decode().strip()
         return np.array([float(v) for v in body.replace("\n", ",").split(",") if v])
 
